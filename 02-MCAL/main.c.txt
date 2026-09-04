@@ -1,0 +1,2172 @@
+/*
+ * main.c
+ *
+ *  Created on: May 12, 2026
+ *      Author: Mohamed Mahrous
+ */
+
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+#include "RCC_interface.h"
+#include "GPIO_interface.h"
+#include "SYSTICK_interface.h"
+
+
+/* ===== numbers ===== */
+u8 numbers[10][7] = {
+    {1,1,1,1,1,1,0}, //0
+    {0,1,1,0,0,0,0}, //1
+    {1,1,0,1,1,0,1}, //2
+    {1,1,1,1,0,0,1}, //3
+    {0,1,1,0,0,1,1}, //4
+    {1,0,1,1,0,1,1}, //5
+    {1,0,1,1,1,1,1}, //6
+    {1,1,1,0,0,0,0}, //7
+    {1,1,1,1,1,1,1}, //8
+    {1,1,1,1,0,1,1}  //9
+};
+
+
+void display_number(u8 num);
+void enable_digit(u8 d);
+void display_time(u8 h, u8 m, u8 s);
+
+
+
+/* ===== time ===== */
+u8 seconds = 0;
+u8 minutes = 0;
+u8 hours   = 0;
+
+
+
+
+int main(void)
+{
+	/* ================= RCC ================= */
+
+	RCC_voidInitSysClock();
+
+	/* Enable GPIOA Clock */
+	RCC_voidEableClock(RCC_APB2 , 2);
+
+	/* ================= GPIO ================= */
+
+	/* PA0 -> PA4 OUTPUT PUSH PULL 2MHz */
+
+	MGPIO_voidSetpinDirection(GPIOA , 0 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOA , 1 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOA , 2 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOA , 3 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOA , 4 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOA , 5 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOA , 6 , 0b0010);
+	
+	/* ================= SysTick ================= */
+
+	MSTK_voidInit();
+	
+	
+	/* segments */
+	    for(int i = 0; i < 7; i++)
+	        MGPIO_voidSetpinDirection(GPIOB , i , OUTPUT_SPEED_10MHZ_PP);
+
+	    /* digits */
+	    MGPIO_voidSetpinDirection(GPIOB , PIN11 , OUTPUT_SPEED_10MHZ_PP);  // sec
+	    MGPIO_voidSetpinDirection(GPIOB , PIN12 , OUTPUT_SPEED_10MHZ_PP);  // min
+	    MGPIO_voidSetpinDirection(GPIOB , PIN13 , OUTPUT_SPEED_10MHZ_PP); // hour
+
+
+	while(1)
+	{
+		
+    	for(int i = 0; i < 70; i++)
+    	        {
+    	display_time(hours, minutes, seconds);
+    	       }
+
+      //  delay_ms(200);
+
+        /* زيادة الثواني */
+        seconds++;
+
+        if(seconds > 9)
+        {
+            seconds = 0;
+            MSTK_voidDelayMs(200);
+            minutes++;
+        }
+
+        if(minutes > 4)
+        {
+            minutes = 0;
+            MSTK_voidDelayMs(1000);
+            hours++;
+        }
+
+        if(hours > 3)
+        {
+            hours = 0;
+            MSTK_voidDelayMs(1000);
+        }
+    
+
+		
+		
+		/*****************************************************/
+		/* LED 1 */
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+				MSTK_voidDelayMs(200);
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+				MSTK_voidDelayMs(200);
+				/* LED 2 */
+
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+                MSTK_voidDelayMs(200);
+                MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+                MSTK_voidDelayMs(200);
+				/* LED 3 */
+
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+                MSTK_voidDelayMs(200);
+                MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+                MSTK_voidDelayMs(200);
+				/* LED 4 */
+
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+                MSTK_voidDelayMs(200);
+                MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+                MSTK_voidDelayMs(200);
+				/* LED 5 */
+
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+                MSTK_voidDelayMs(200);
+                MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+				MSTK_voidDelayMs(200);
+
+		/**************************************************/
+
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+				MSTK_voidDelayMs(200);
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+				MSTK_voidDelayMs(200);
+				/* LED 2 */
+
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+                MSTK_voidDelayMs(200);
+                MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+                MSTK_voidDelayMs(200);
+				/* LED 3 */
+
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+                MSTK_voidDelayMs(200);
+                MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+                MSTK_voidDelayMs(200);
+				/* LED 4 */
+
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+                MSTK_voidDelayMs(200);
+                MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+                MSTK_voidDelayMs(200);
+				/* LED 5 */
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+                MSTK_voidDelayMs(200);
+                MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+				MSTK_voidDelayMs(200);
+
+/**************************************************/
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+								MSTK_voidDelayMs(200);
+								MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+								/* LED 2 */
+
+								MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 3 */
+
+								MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 4 */
+
+								MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 5 */
+
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+
+
+				/*********************************************/
+
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+								MSTK_voidDelayMs(200);
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+								/* LED 2 */
+
+								MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 3 */
+
+								MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 4 */
+
+								MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 5 */
+
+								MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+
+/**************************************************/
+
+								MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+								MSTK_voidDelayMs(200);
+								MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+								/* LED 2 */
+
+								MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 3 */
+
+								MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 4 */
+
+								MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 5 */
+
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+
+						/**************************************************/
+
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+								MSTK_voidDelayMs(200);
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+								/* LED 2 */
+
+								MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 3 */
+
+								MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 4 */
+
+								MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 5 */
+
+								MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+
+				/**************************************************/
+
+
+								MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+								MSTK_voidDelayMs(200);
+								MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+								/* LED 2 */
+
+								MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 3 */
+
+								MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 4 */
+
+								MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 5 */
+
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+
+						/**************************************************/
+
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+								MSTK_voidDelayMs(200);
+								MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+								/* LED 2 */
+
+								MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 3 */
+
+								MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 4 */
+
+								MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				                MSTK_voidDelayMs(200);
+								/* LED 5 */
+
+								MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+				                MSTK_voidDelayMs(200);
+				                MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+								MSTK_voidDelayMs(200);
+
+				/**************************************************/
+
+			MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+			MSTK_voidDelayMs(200);
+
+
+			MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+			MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+			MSTK_voidDelayMs(200);
+
+
+			MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+			MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+			MSTK_voidDelayMs(200);
+
+
+
+
+
+    		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+    		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+    		MSTK_voidDelayMs(200);
+    		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+    		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+    		MSTK_voidDelayMs(200);
+
+    		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+    		MSTK_voidDelayMs(200);
+
+
+
+
+			/**************************************************/
+
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+		MSTK_voidDelayMs(200);
+
+
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+		MSTK_voidDelayMs(200);
+
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+		MSTK_voidDelayMs(200);
+
+
+
+
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+		MSTK_voidDelayMs(200);
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+		MSTK_voidDelayMs(200);
+
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+		MSTK_voidDelayMs(200);
+
+
+           /**************************************************/
+
+
+	MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+	MSTK_voidDelayMs(200);
+
+
+	MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+	MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+	MSTK_voidDelayMs(200);
+
+
+	MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+	MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+	MSTK_voidDelayMs(200);
+
+
+
+
+
+	MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+	MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+	MSTK_voidDelayMs(200);
+	MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+	MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+	MSTK_voidDelayMs(200);
+
+	MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+	MSTK_voidDelayMs(200);
+
+
+
+/**************************************************/
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+/***************************************/
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+MSTK_voidDelayMs(200);
+
+
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+
+
+/*************************************************/
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 2 */
+
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 3 */
+
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 4 */
+
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 5 */
+
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* Reset LEDs */
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+		MSTK_voidDelayMs(200);
+
+		/**************************************************/
+
+		/* LED 1 */
+
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 2 */
+
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 3 */
+
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 4 */
+
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 5 */
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* Reset LEDs */
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+		MSTK_voidDelayMs(200);
+
+
+
+		/**************************************************/
+
+		/*************************************************/
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 2 */
+
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 3 */
+
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 4 */
+
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 5 */
+
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* Reset LEDs */
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+				MSTK_voidDelayMs(200);
+
+				/**************************************************/
+
+				/* LED 1 */
+
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 2 */
+
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 3 */
+
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 4 */
+
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 5 */
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* Reset LEDs */
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+				MSTK_voidDelayMs(200);
+
+
+
+				/**************************************************/
+				/*************************************************/
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 2 */
+
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 3 */
+
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 4 */
+
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 5 */
+
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* Reset LEDs */
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+		MSTK_voidDelayMs(200);
+
+		/**************************************************/
+
+		/* LED 1 */
+
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 2 */
+
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 3 */
+
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 4 */
+
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 5 */
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* Reset LEDs */
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+		MSTK_voidDelayMs(200);
+
+
+
+		/**************************************************/
+		/*************************************************/
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 2 */
+
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 3 */
+
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 4 */
+
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 5 */
+
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* Reset LEDs */
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+				MSTK_voidDelayMs(200);
+
+				/**************************************************/
+
+				/* LED 1 */
+
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 2 */
+
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 3 */
+
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 4 */
+
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* LED 5 */
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+				MSTK_voidDelayMs(200);
+
+				/* Reset LEDs */
+
+				MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+				MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+				MSTK_voidDelayMs(200);
+               /**************************************************/
+
+				/*************************************************/
+
+		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 2 */
+
+		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+		/* LED 3 */
+
+		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+		MSTK_voidDelayMs(200);
+
+						/* LED 4 */
+
+						MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+						MSTK_voidDelayMs(200);
+
+						/* LED 5 */
+
+						MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+						MSTK_voidDelayMs(200);
+
+						/* Reset LEDs */
+
+						MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+						MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+						MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+						MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+						MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+						MSTK_voidDelayMs(200);
+
+						/**************************************************/
+
+						/* LED 1 */
+
+						MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+
+						MSTK_voidDelayMs(200);
+
+						/* LED 2 */
+
+						MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+
+						MSTK_voidDelayMs(200);
+
+						/* LED 3 */
+
+						MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+
+						MSTK_voidDelayMs(200);
+
+						/* LED 4 */
+
+						MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+
+						MSTK_voidDelayMs(200);
+
+						/* LED 5 */
+
+						MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+
+						MSTK_voidDelayMs(200);
+
+						/* Reset LEDs */
+
+						MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+						MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+						MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+						MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+						MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+
+						MSTK_voidDelayMs(200);
+
+
+
+/**************************************************/
+
+
+
+
+/* LED 1 */
+
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+        		MSTK_voidDelayMs(200);
+        		/**************************************************/
+
+
+
+
+        		/* LED 1 */
+
+        		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+        		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+        		MSTK_voidDelayMs(200);
+
+
+        		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+        		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+        		MSTK_voidDelayMs(200);
+
+
+        		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+        		MSTK_voidDelayMs(200);
+
+
+        		MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+        		MSTK_voidDelayMs(200);
+        		MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+        		MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+        		MSTK_voidDelayMs(200);
+        		MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+        		MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+        		        		MSTK_voidDelayMs(200);
+/**************************************************/
+
+
+
+
+/* LED 1 */
+
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+MSTK_voidDelayMs(200);
+/**************************************************/
+
+
+
+
+/* LED 1 */
+
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+        		MSTK_voidDelayMs(200);
+
+/*******************************************************/
+/**************************************************/
+
+
+
+
+/* LED 1 */
+
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_HIGH);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_HIGH);
+MSTK_voidDelayMs(200);
+
+
+MGPIO_voidSetpinValue(GPIOA , 2 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 0 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 4 , GPIO_LOW);
+MSTK_voidDelayMs(200);
+MGPIO_voidSetpinValue(GPIOA , 1 , GPIO_LOW);
+MGPIO_voidSetpinValue(GPIOA , 3 , GPIO_LOW);
+
+        		MSTK_voidDelayMs(200);
+
+        		/**************************************************/
+		}
+}
+
+
+/* ===== display number ===== */
+void display_number(u8 num)
+{
+    for(u8 i = 0; i < 7; i++)
+    {
+        MGPIO_voidSetpinValue(GPIOA , i , numbers[num][i]);
+    }
+}
+
+/* ===== enable digit ===== */
+void enable_digit(u8 d)
+{
+    MGPIO_voidSetpinValue(GPIOB , PIN11 , 0);
+    MGPIO_voidSetpinValue(GPIOB , PIN12 , 0);
+    MGPIO_voidSetpinValue(GPIOB , PIN13 , 0);
+
+    if(d == 0) MGPIO_voidSetpinValue(GPIOB , PIN11 , 1);   // seconds
+    if(d == 1) MGPIO_voidSetpinValue(GPIOB , PIN12 , 1);   // minutes
+    if(d == 2) MGPIO_voidSetpinValue(GPIOB , PIN13 , 1);  // hours
+}
+
+/* ===== display time (H M S) ===== */
+void display_time(u8 h, u8 m, u8 s)
+{
+    enable_digit(0);
+    display_number(s);
+    MSTK_voidDelayMs(2);
+
+    enable_digit(1);
+    display_number(m);
+    MSTK_voidDelayMs(2);
+
+    enable_digit(2);
+    display_number(h);
+    MSTK_voidDelayMs(2);
+}
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------
+
+
+/*
+ * main.c
+ *
+ *  Created on: May 12, 2026
+ *      Author: Mohamed Mahrous
+ */
+
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+#include "RCC_interface.h"
+#include "GPIO_interface.h"
+#include "SYSTICK_interface.h"
+#include "NVIC_interface.h"
+#include "EXTI_interface.h"
+#include "AFIO_interface.h"
+
+/* ===== numbers ===== */
+u8 numbers[10][7] = {
+    {1,1,1,1,1,1,0}, //0
+    {0,1,1,0,0,0,0}, //1
+    {1,1,0,1,1,0,1}, //2
+    {1,1,1,1,0,0,1}, //3
+    {0,1,1,0,0,1,1}, //4
+    {1,0,1,1,0,1,1}, //5
+    {1,0,1,1,1,1,1}, //6
+    {1,1,1,0,0,0,0}, //7
+    {1,1,1,1,1,1,1}, //8
+    {1,1,1,1,0,1,1}  //9
+};
+
+
+void display_number(u8 num);
+void enable_digit(u8 d);
+void display_time(u8 h, u8 m, u8 s);
+
+
+/* ===== time ===== */
+u8 seconds = 0;
+u8 minutes = 0;
+u8 hours   = 0;
+
+
+volatile u8 running = 0;
+
+int main(void)
+{
+	/* ================= RCC ================= */
+
+	RCC_voidInitSysClock();
+
+	/* Enable GPIOA Clock */
+	RCC_voidEableClock(RCC_APB2 , 2);
+
+	/* Enable GPIOB Clock */
+	RCC_voidEableClock(RCC_APB2 , 3);
+	RCC_voidEableClock(RCC_APB2 , 4);
+	/* Enable AFIO clock  */
+	RCC_voidEableClock(RCC_APB2 , 0);
+
+	/* ================= SysTick ================= */
+
+		MSTK_voidInit();
+		MNVIC_voidInit();
+		MEXTI_voidInit();
+
+
+	/* ================= GPIO ================= */
+
+	/* PA0 -> PA6 OUTPUT PUSH PULL 2MHz */
+
+	MGPIO_voidSetpinDirection(GPIOB , 0 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOB , 1 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOC , 15 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOC , 14 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOC , 13 , 0b0010);
+
+	/* Switch */
+	MGPIO_voidSetpinDirection(GPIOA , 8 , 0b0010);
+	MGPIO_voidSetpinDirection(GPIOA , 9 , 0b0010);
+
+		/* segments */
+	for(int i = 0; i < 7; i++)
+	{
+		MGPIO_voidSetpinDirection(GPIOA , i , OUTPUT_SPEED_10MHZ_PP);
+	}
+
+	/* digits */
+	MGPIO_voidSetpinDirection(GPIOB , PIN12 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection(GPIOB , PIN13 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection(GPIOB , PIN14 , OUTPUT_SPEED_10MHZ_PP);
+
+
+	    MNVIC_voidSetPriority(6,0b01000000); /* EXIT 0 GROUP 1 SUB 0 */
+	    MNVIC_voidSetPriority(7,0b00110000); /* EXIT 0 GROUP 1 SUB 0 */
+
+	    MNVIC_voidEnableInterrupt(6); /* EXIT0 */
+	    MNVIC_voidEnableInterrupt(7); /* EXIT1 */
+
+	    MNVIC_voidSetpendingflag(6);
+	    MNVIC_voidSetpendingflag(7);
+
+
+	while(1)
+	{
+
+		MGPIO_voidSetpinValue(GPIOB , 0 , GPIO_HIGH);
+		MGPIO_voidSetpinValue(GPIOB , 1 , GPIO_HIGH);
+		MGPIO_voidSetpinValue(GPIOC , 15 , GPIO_HIGH);
+		MGPIO_voidSetpinValue(GPIOC , 14 , GPIO_HIGH);
+		MGPIO_voidSetpinValue(GPIOC , 13 , GPIO_HIGH);
+
+
+	//	MSTK_voidDelayMs(200);
+
+/*
+		MGPIO_voidSetpinValue(GPIOB , 0 , GPIO_HIGH);
+		MGPIO_voidSetpinValue(GPIOB , 4 , GPIO_HIGH);
+		MSTK_voidDelayMs(200);
+
+
+		MGPIO_voidSetpinValue(GPIOB , 3 , GPIO_HIGH);
+		MSTK_voidDelayMs(200);
+
+
+		MGPIO_voidSetpinValue(GPIOB , 3 , GPIO_LOW);
+		MSTK_voidDelayMs(200);
+		MGPIO_voidSetpinValue(GPIOB , 0 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOB , 4 , GPIO_LOW);
+		MSTK_voidDelayMs(200);
+		MGPIO_voidSetpinValue(GPIOB , 1 , GPIO_LOW);
+		MGPIO_voidSetpinValue(GPIOB , 3 , GPIO_LOW);
+
+
+*/
+		for(int i = 0; i < 70; i++)
+		{
+			display_time(hours, minutes, seconds);
+		}
+
+		/* زيادة الثواني */
+		seconds++;
+
+		if(seconds > 9)
+		{
+			seconds = 0;
+			MSTK_voidDelayMs(200);
+			minutes++;
+		}
+
+		if(minutes > 4)
+		{
+			minutes = 0;
+			MSTK_voidDelayMs(1000);
+			hours++;
+		}
+
+		if(hours > 3)
+		{
+			hours = 0;
+			MSTK_voidDelayMs(1000);
+		}
+
+	}
+}
+
+
+/* ========================================== */
+
+void display_number(u8 num)
+{
+	for(int i = 0 ; i < 7 ; i++)
+	{
+		MGPIO_voidSetpinValue(GPIOA , i , numbers[num][i]);
+	}
+}
+
+/* ========================================== */
+
+void enable_digit(u8 d)
+{
+	/* disable all digits */
+
+	MGPIO_voidSetpinValue(GPIOB , PIN12 , GPIO_LOW);
+	MGPIO_voidSetpinValue(GPIOB , PIN13 , GPIO_LOW);
+	MGPIO_voidSetpinValue(GPIOB , PIN14 , GPIO_LOW);
+
+	/* enable one digit */
+
+	switch(d)
+	{
+	case 0:
+		MGPIO_voidSetpinValue(GPIOB , PIN12 , GPIO_HIGH);
+		break;
+
+	case 1:
+		MGPIO_voidSetpinValue(GPIOB , PIN13 , GPIO_HIGH);
+		break;
+
+	case 2:
+		MGPIO_voidSetpinValue(GPIOB , PIN14 , GPIO_HIGH);
+		break;
+	}
+}
+
+/* ========================================== */
+
+void display_time(u8 h, u8 m, u8 s)
+{
+	enable_digit(0);
+	display_number(s);
+	MSTK_voidDelayMs(5);
+
+	enable_digit(1);
+	display_number(m);
+	MSTK_voidDelayMs(5);
+
+	enable_digit(2);
+	display_number(h);
+	MSTK_voidDelayMs(5);
+}
+
+
+void EXTI0_IRQHandler(void)
+   {
+
+	MGPIO_voidSetpinValue(GPIOA, 8, GPIO_HIGH);
+}
+
+
+void EXTI1_IRQHandler(void)
+   {
+
+	MGPIO_voidSetpinValue(GPIOA, 9, GPIO_HIGH);
+
+   }
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------
+
+
+/*
+ * main.c
+ *
+ *  Created on: May 12, 2026
+ *      Author: Mohamed Mahrous
+ */
+
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+#include "RCC_interface.h"
+#include "GPIO_interface.h"
+#include "SYSTICK_interface.h"
+#include "NVIC_interface.h"
+#include "EXTI_interface.h"
+#include "AFIO_interface.h"
+
+
+/* ===== numbers ===== */
+
+u8 numbers[10][7] =
+{
+    {1,1,1,1,1,1,0}, //0
+    {0,1,1,0,0,0,0}, //1
+    {1,1,0,1,1,0,1}, //2
+    {1,1,1,1,0,0,1}, //3
+    {0,1,1,0,0,1,1}, //4
+    {1,0,1,1,0,1,1}, //5
+    {1,0,1,1,1,1,1}, //6
+    {1,1,1,0,0,0,0}, //7
+    {1,1,1,1,1,1,1}, //8
+    {1,1,1,1,0,1,1}  //9
+};
+
+
+/* ===== functions ===== */
+
+void display_number(u8 num);
+void enable_digit(u8 d);
+void display_time(u8 h, u8 m, u8 s);
+
+
+/* ===== time ===== */
+
+u8 seconds = 0;
+u8 minutes = 0;
+u8 hours   = 0;
+
+
+/* ===== run flag ===== */
+
+volatile u8 running = 0;
+
+
+/* ========================================================= */
+
+int main(void)
+{
+	/* ================= RCC ================= */
+
+	RCC_voidInitSysClock();
+
+	/* Enable GPIOA Clock */
+	RCC_voidEableClock(RCC_APB2 , 2);
+
+	/* Enable GPIOB Clock */
+	RCC_voidEableClock(RCC_APB2 , 3);
+
+	/* Enable GPIOC Clock */
+	RCC_voidEableClock(RCC_APB2 , 4);
+
+	/* Enable AFIO Clock */
+	RCC_voidEableClock(RCC_APB2 , 0);
+
+	/* ================= EXTI ================= */
+	MEXTI_voidInit();
+	/* ================= SysTick ================= */
+
+	MSTK_voidInit();
+
+	/* ================= NVIC ================= */
+
+	MNVIC_voidInit();
+
+
+	/* ================= GPIO ================= */
+
+	/* segments PA0 -> PA6 */
+
+	for(int i = 0; i < 7; i++)
+	{
+		MGPIO_voidSetpinDirection(GPIOA , i , OUTPUT_SPEED_10MHZ_PP);
+	}
+
+	/* digits */
+
+	MGPIO_voidSetpinDirection(GPIOB , PIN12 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection(GPIOB , PIN13 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection(GPIOB , PIN14 , OUTPUT_SPEED_10MHZ_PP);
+
+	/* LEDs */
+
+	MGPIO_voidSetpinDirection(GPIOA , 8 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection(GPIOA , 9 , OUTPUT_SPEED_10MHZ_PP);
+
+	/* Switches */
+
+	MGPIO_voidSetpinDirection(GPIOB , PIN0 , INPUT_PULLUP_PULLDOWN);
+	MGPIO_voidSetpinDirection(GPIOB , PIN1 , INPUT_PULLUP_PULLDOWN);
+
+	/* Pull Up */
+
+	MGPIO_voidSetpinValue(GPIOB , PIN0 , GPIO_HIGH);
+	MGPIO_voidSetpinValue(GPIOB , PIN1 , GPIO_HIGH);
+
+
+
+	/* ================= EXTI ================= */
+
+	/* EXTI0 -> PB0 */
+
+
+
+	MAFIO_voidSetEXTIConfiguration(0 , AFIO_PB);
+	MEXTI_voidEnableEXTI(0);
+
+	MEXTI_voidSetSignalLatch(0 ,  FALING_EDGE);
+
+
+	/* EXTI1 -> PB1 */
+
+	MAFIO_voidSetEXTIConfiguration(1 , AFIO_PB);
+
+	MEXTI_voidEnableEXTI(1);
+
+	MEXTI_voidSetSignalLatch(1 ,  FALING_EDGE);
+
+
+
+	/* ================= NVIC ================= */
+
+	MNVIC_voidEnableInterrupt(6); /* EXTI0 */
+
+	MNVIC_voidEnableInterrupt(7); /* EXTI1 */
+
+
+
+	/* ================= while ================= */
+
+	while(1)
+	{
+		for(int i = 0; i < 70; i++)
+		{
+			display_time(hours, minutes, seconds);
+		}
+
+		if(running == 1)
+		{
+			seconds++;
+
+			if(seconds > 9)
+			{
+				seconds = 0;
+				minutes++;
+			}
+
+			if(minutes > 9)
+			{
+				minutes = 0;
+				hours++;
+			}
+
+			if(hours > 9)
+			{
+				hours = 0;
+			}
+
+			MSTK_voidDelayMs(1000);
+		}
+	}
+}
+
+
+/* ========================================================= */
+
+void display_number(u8 num)
+{
+	for(int i = 0 ; i < 7 ; i++)
+	{
+		MGPIO_voidSetpinValue(GPIOA , i , numbers[num][i]);
+	}
+}
+
+
+/* ========================================================= */
+
+void enable_digit(u8 d)
+{
+	/* disable all digits */
+
+	MGPIO_voidSetpinValue(GPIOB , PIN12 , GPIO_LOW);
+	MGPIO_voidSetpinValue(GPIOB , PIN13 , GPIO_LOW);
+	MGPIO_voidSetpinValue(GPIOB , PIN14 , GPIO_LOW);
+
+	/* enable one digit */
+
+	switch(d)
+	{
+	case 0:
+		MGPIO_voidSetpinValue(GPIOB , PIN12 , GPIO_HIGH);
+		break;
+
+	case 1:
+		MGPIO_voidSetpinValue(GPIOB , PIN13 , GPIO_HIGH);
+		break;
+
+	case 2:
+		MGPIO_voidSetpinValue(GPIOB , PIN14 , GPIO_HIGH);
+		break;
+	}
+}
+
+
+/* ========================================================= */
+
+void display_time(u8 h, u8 m, u8 s)
+{
+	enable_digit(0);
+	display_number(s);
+	MSTK_voidDelayMs(5);
+
+	enable_digit(1);
+	display_number(m);
+	MSTK_voidDelayMs(5);
+
+	enable_digit(2);
+	display_number(h);
+	MSTK_voidDelayMs(5);
+}
+
+
+/* ========================================================= */
+
+void EXTI0_IRQHandler(void)
+{
+	running = 1;
+
+	/* RUN LED */
+
+	MGPIO_voidSetpinValue(GPIOA , 8 , GPIO_HIGH);
+	MGPIO_voidSetpinValue(GPIOA , 9 , GPIO_LOW);
+
+	MEXTI_voidClearPendingFlag(0);
+}
+
+
+/* ========================================================= */
+
+void EXTI1_IRQHandler(void)
+{
+	running = 0;
+
+	/* STOP LED */
+
+	MGPIO_voidSetpinValue(GPIOA , 9 , GPIO_HIGH);
+	MGPIO_voidSetpinValue(GPIOA , 8 , GPIO_LOW);
+
+	MEXTI_voidClearPendingFlag(1);
+}
+
+
+
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+
+/*
+ * main.c
+ *
+ *  Created on: May 15, 2026
+ *      Author: Mohamed Mahrous
+ */
+
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+#include "RCC_interface.h"
+#include "GPIO_interface.h"
+#include "SYSTICK_interface.h"
+#include "NVIC_interface.h"
+#include "EXTI_interface.h"
+#include "AFIO_interface.h"
+
+
+/* ================= Numbers ================= */
+
+u8 numbers[10][7] =
+{
+    {1,1,1,1,1,1,0}, //0
+    {0,1,1,0,0,0,0}, //1
+    {1,1,0,1,1,0,1}, //2
+    {1,1,1,1,0,0,1}, //3
+    {0,1,1,0,0,1,1}, //4
+    {1,0,1,1,0,1,1}, //5
+    {1,0,1,1,1,1,1}, //6
+    {1,1,1,0,0,0,0}, //7
+    {1,1,1,1,1,1,1}, //8
+    {1,1,1,1,0,1,1}  //9
+};
+
+
+/* ================= Functions ================= */
+
+void display_number(u8 num);
+void enable_digit(u8 d);
+void display_time(u8 h , u8 m , u8 s);
+
+
+/* ================= Time ================= */
+
+u8 seconds = 0;
+u8 minutes = 0;
+u8 hours   = 0;
+
+
+/* ================= Run Flag ================= */
+
+volatile u8 running = 0;
+
+
+/* ========================================================= */
+
+int main(void)
+{
+	/* ================= RCC ================= */
+
+	RCC_voidInitSysClock();
+
+	/* Enable GPIOA Clock */
+	RCC_voidEableClock(RCC_APB2 , 2);
+
+	/* Enable GPIOB Clock */
+	RCC_voidEableClock(RCC_APB2 , 3);
+
+	/* Enable AFIO Clock */
+	RCC_voidEableClock(RCC_APB2 , 0);
+
+
+	/* ================= EXTI ================= */
+
+	MEXTI_voidInit();
+
+
+	/* ================= SysTick ================= */
+
+	MSTK_voidInit();
+
+
+	/* ================= NVIC ================= */
+
+	MNVIC_voidInit();
+
+
+	/* ================= GPIO ================= */
+
+	/* Segments PA0 -> PA6 */
+
+	for(int i = 0 ; i < 7 ; i++)
+	{
+		MGPIO_voidSetpinDirection(GPIOA , i , OUTPUT_SPEED_10MHZ_PP);
+	}
+
+
+	/* Digits */
+
+	MGPIO_voidSetpinDirection(GPIOB , PIN12 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection(GPIOB , PIN13 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection(GPIOB , PIN14 , OUTPUT_SPEED_10MHZ_PP);
+
+
+	/* LEDs */
+
+	MGPIO_voidSetpinDirection(GPIOA , PIN8 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection(GPIOA , PIN9 , OUTPUT_SPEED_10MHZ_PP);
+
+
+	/* Switches PB0 PB1 */
+
+	MGPIO_voidSetpinDirection(GPIOB , PIN0 , INPUT_PULL_UP_DOWN);
+	MGPIO_voidSetpinDirection(GPIOB , PIN1 , INPUT_PULL_UP_DOWN);
+
+
+	/* Pull Up */
+
+	MGPIO_voidSetpinValue(GPIOB , PIN0 , GPIO_HIGH);
+	MGPIO_voidSetpinValue(GPIOB , PIN1 , GPIO_HIGH);
+
+
+	/* ================= AFIO + EXTI ================= */
+
+	/* EXTI0 -> PB0 */
+
+	MAFIO_voidSetEXTIConfiguration(0 , AFIO_PB);
+
+	MEXTI_voidEnableEXTI(0);
+
+	MEXTI_voidSetSignalLatch(0 , FALLING_EDGE);
+
+
+	/* EXTI1 -> PB1 */
+
+	MAFIO_voidSetEXTIConfiguration(1 , AFIO_PB);
+
+	MEXTI_voidEnableEXTI(1);
+
+	MEXTI_voidSetSignalLatch(1 , FALLING_EDGE);
+
+
+	/* ================= NVIC ================= */
+
+	MNVIC_voidEnableInterrupt(6);
+
+	MNVIC_voidEnableInterrupt(7);
+
+
+	/* ================= While ================= */
+
+	while(1)
+	{
+		for(int i = 0 ; i < 70 ; i++)
+		{
+			display_time(hours , minutes , seconds);
+		}
+
+
+		if(running == 1)
+		{
+			seconds++;
+
+			if(seconds > 9)
+			{
+				seconds = 0;
+
+				minutes++;
+			}
+
+
+			if(minutes > 9)
+			{
+				minutes = 0;
+
+				hours++;
+			}
+
+
+			if(hours > 9)
+			{
+				hours = 0;
+			}
+
+
+		//	MSTK_voidDelayMs(1000);
+		}
+	}
+}
+
+
+/* ========================================================= */
+
+void display_number(u8 num)
+{
+	for(int i = 0 ; i < 7 ; i++)
+	{
+		MGPIO_voidSetpinValue(GPIOA , i , numbers[num][i]);
+	}
+}
+
+
+/* ========================================================= */
+
+void enable_digit(u8 d)
+{
+	/* Disable All */
+
+	MGPIO_voidSetpinValue(GPIOB , PIN12 , GPIO_LOW);
+	MGPIO_voidSetpinValue(GPIOB , PIN13 , GPIO_LOW);
+	MGPIO_voidSetpinValue(GPIOB , PIN14 , GPIO_LOW);
+
+
+	switch(d)
+	{
+		case 0:
+
+			MGPIO_voidSetpinValue(GPIOB , PIN12 , GPIO_HIGH);
+
+			break;
+
+
+		case 1:
+
+			MGPIO_voidSetpinValue(GPIOB , PIN13 , GPIO_HIGH);
+
+			break;
+
+
+		case 2:
+
+			MGPIO_voidSetpinValue(GPIOB , PIN14 , GPIO_HIGH);
+
+			break;
+	}
+}
+
+
+/* ========================================================= */
+
+void display_time(u8 h , u8 m , u8 s)
+{
+	enable_digit(0);
+
+	display_number(s);
+
+	MSTK_voidDelayMs(5);
+
+
+	enable_digit(1);
+
+	display_number(m);
+
+	MSTK_voidDelayMs(5);
+
+
+	enable_digit(2);
+
+	display_number(h);
+
+	MSTK_voidDelayMs(5);
+}
+
+
+/* ========================================================= */
+
+void EXTI0_IRQHandler(void)
+{
+	running = 1;
+
+	/* RUN LED */
+
+	MGPIO_voidSetpinValue(GPIOA , PIN8 , GPIO_HIGH);
+
+	MGPIO_voidSetpinValue(GPIOA , PIN9 , GPIO_LOW);
+
+	MEXTI_voidClearPendingFlag(0);
+}
+
+
+/* ========================================================= */
+
+void EXTI1_IRQHandler(void)
+{
+	running = 0;
+
+	/* STOP LED */
+
+	MGPIO_voidSetpinValue(GPIOA , PIN9 , GPIO_HIGH);
+
+	MGPIO_voidSetpinValue(GPIOA , PIN8 , GPIO_LOW);
+
+	MEXTI_voidClearPendingFlag(1);
+}
+
