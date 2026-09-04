@@ -1,0 +1,96 @@
+/*************************************************************************/
+/* --------------- Author       : Mohamed Mahrous ---------------------- */
+/* --------------- Date         : 30  MAY   2026   ---------------------- */
+/* --------------- Version      : V01             ---------------------- */
+/* --------------- Description  : LEDMRX_Program_C  ---------------------- */
+/*************************************************************************/
+
+
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+
+#include "GPIO_interface.h"
+#include "SYSTICK_interface.h"
+
+#include "LED_interface.h"
+#include "LED_private.h"
+#include "LED_config.h"
+
+
+
+
+
+void LED_voidInit(void)
+{
+
+    MGPIO_voidSetpinDirection( GPIOA, PIN0 , OUTPUT_SPEED_10MHZ_PP);
+    MGPIO_voidSetpinDirection( GPIOA, PIN1 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection( GPIOA, PIN2 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection( GPIOA, PIN3 , OUTPUT_SPEED_10MHZ_PP);
+	MGPIO_voidSetpinDirection( GPIOA, PIN4 , OUTPUT_SPEED_10MHZ_PP);
+	
+}
+void LED_voidOn  (u8 copy_u8Led)
+{
+    switch(copy_u8Led){
+	    
+	case LED1:
+	      MGPIO_voidSetpinValue(GPIOA, PIN0 , GPIO_HIGH); break;
+	case LED2:
+	      MGPIO_voidSetpinValue(GPIOA, PIN1 , GPIO_HIGH); break;
+	case LED3:
+	      MGPIO_voidSetpinValue(GPIOA, PIN2 , GPIO_HIGH); break;
+	case LED4:
+	      MGPIO_voidSetpinValue(GPIOA, PIN3 , GPIO_HIGH); break;
+	case LED5:
+	      MGPIO_voidSetpinValue(GPIOA, PIN4 , GPIO_HIGH); break;
+    default: break; 		  
+		  
+	}
+}
+
+void LED_voidOff (u8 copy_u8Led)
+{
+
+   switch(copy_u8Led){	  
+     
+   case LED1:
+        MGPIO_voidSetpinValue(GPIOA, PIN0 , GPIO_LOW); break;
+   case LED2:
+        MGPIO_voidSetpinValue(GPIOA, PIN1 , GPIO_LOW); break;
+   case LED3:
+        MGPIO_voidSetpinValue(GPIOA, PIN2 , GPIO_LOW); break;
+   case LED4:
+        MGPIO_voidSetpinValue(GPIOA, PIN3 , GPIO_LOW); break;
+   case LED5:
+        MGPIO_voidSetpinValue(GPIOA, PIN4 , GPIO_LOW); break;
+	default: break;
+  	}  
+ }
+ 
+ 
+
+void LED_voidToggle (u8 copy_u8Led)
+{
+
+   switch(copy_u8Led){	  
+     
+   case LED1:
+        MGPIO_voidSetpinValue(GPIOA, PIN0); break;
+   case LED2:
+        MGPIO_voidSetpinValue(GPIOA, PIN1); break;
+   case LED3:
+        MGPIO_voidSetpinValue(GPIOA, PIN2); break;
+   case LED4:
+        MGPIO_voidSetpinValue(GPIOA, PIN3); break;
+   case LED5:
+        MGPIO_voidSetpinValue(GPIOA, PIN4); break;
+		
+	default: break;	
+  	}  
+ }
+
+ 
+ 
+ 
