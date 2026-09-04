@@ -1,0 +1,69 @@
+/*************************************************************************/
+/* --------------- Author       : Mohamed Mahrous ---------------------- */
+/* --------------- Date         : 2  APRIL   2026 ---------------------- */
+/* --------------- Version      : V01             ---------------------- */
+/* --------------- Description  : main_C  ---------------------- */
+/*************************************************************************/
+
+
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+#include "STK_interface.h"
+#include "OS_interface.h"
+
+
+void LED1(void);
+void LED2(void);
+void LED3(void);
+
+int main(void)
+{
+  /*   initializtion      */
+  / *  Rcc initializtion  */
+  /*  Enable GPIO RCC  PORT A */
+  
+  /* GPIO initializtion  Direction */
+  
+  SOS_voidCreateTask(0 , 1000, LED1 , 0);
+  SOS_voidCreateTask(1 , 2000, LED2 , 1);
+  SOS_voidCreateTask(2 , 3000, LED3 , 2);
+  
+  SOS_voidStart();
+  
+  while(1)
+ {
+
+
+ }
+ return  0;
+}
+
+void LED1(void)
+{
+  /*  Togel Bit */
+   static u8  Local_u8Pin0 = 0;
+   TOG_BIT(Local_u8Pin0 , 0);
+   MGPIO_voidSetpinvalue(GPIOA , PIN0 , Local_u8Pin0)
+}
+
+
+void LED2(void)
+{
+  /*  Togel Bit */
+   static u8  Local_u8Pin1 = 0;
+   TOG_BIT(Local_u8Pin1 , 0);
+   MGPIO_voidSetpinvalue(GPIOA , PIN1 , Local_u8Pin1)
+}
+
+void LED3(void)
+{
+  /*  Togel Bit */
+   static u8  Local_u8Pin2 = 0;
+   TOG_BIT(Local_u8Pin2 , 0);
+   MGPIO_voidSetpinvalue(GPIOA , PIN2 , Local_u8Pin2)
+}
+
+
+
+
