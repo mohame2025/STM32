@@ -2,15 +2,15 @@
 /* --------------- Author       : Mohamed Mahrous ---------------------- */
 /* --------------- Date         : 2  APRIL   2026 ---------------------- */
 /* --------------- Version      : V01             ---------------------- */
-/* --------------- Description  : GPIO_CONFIG_H  ---------------------- */
+/* --------------- Description  : OS_CONFIG_H  ---------------------- */
 /*************************************************************************/
 
 
 
 
-#ifndef _GPIO_CONFIG_H
-#define _GPIO_CONFIG_H
+#ifndef _OS_CONFIG_H
+#define _OS_CONFIG_H
 
-
+#define    NUMBER_OF_TASKS     3
 
 #endif

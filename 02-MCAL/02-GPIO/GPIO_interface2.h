@@ -13,6 +13,8 @@
 #ifndef _GPIO_INTERFACE_H
 #define _GPIO_INTERFACE_H
 
+#define HIGH_PORTL 0x00FF
+#define HIGH_PORTH 0xFF00
 
 
 #define      GPIOA          0
@@ -68,6 +70,10 @@ void MGPIO_voidSetpinDirection(u8 copy_u8PORT , u8 copy_u8PIN , u8 copy_u8Mode);
 void MGPIO_voidSetpinValue(u8 copy_u8PORT , u8 copy_u8PIN , u8 copy_u8Value); // HIGH or LOW
 u8 MGPIO_u8GetpinValue(u8 copy_u8PORT , u8 copy_u8PIN);
 
+
+void MGPIO_VidSetPortDirection ( u8 Copy_u8Port , u8 Copy_u8Position , u8 Copy_u8Mode   );
+void MGPIO_VidSetPortValue     ( u8 Copy_u8Port , u8 Copy_u8Position , u16 Copy_u8Value );
+u16  MGPIO_u16GetPortValue      ( u8 Copy_u8Port , u8 Copy_u8Position                   );
 
 
 #endif
