@@ -1,0 +1,27 @@
+/*************************************************************************/
+/* --------------- Author       : Mohamed Mahrous ---------------------- */
+/* --------------- Date         : 30  MAY   2026   ---------------------- */
+/* --------------- Version      : V01             ---------------------- */
+/* --------------- Description  : LED_PRIVATE_H  ---------------------- */
+/*************************************************************************/
+
+
+#ifndef LED_PRIVATE_H
+#define LED_PRIVATE_H
+
+#define LED_PORT1       GPIOA
+#define LED1            PIN0
+
+#define LED_PORT2       GPIOA
+#define LED2            PIN1
+
+#define LED_PORT3       GPIOA
+#define LED3            PIN2
+
+#define LED_PORT4       GPIOA
+#define LED4            PIN3
+
+#define LED_PORT5       GPIOA
+#define LED5            PIN4
+
+#endif
