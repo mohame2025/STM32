@@ -184,4 +184,4 @@ void USART_SendString(u8 Copy_u8USART, const char *Copy_pchString)
 	}
 }
 
-/* USART_SendString(USART1, "Hello Mohamed");
+/* USART_SendString(USART1, "Hello Mohamed"); */
