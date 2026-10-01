@@ -1,0 +1,20 @@
+/**************************************************************************/
+/* --------------- Author       : Mohamed Mahrous  ---------------------- */
+/* --------------- Date         : 30  MAY   2026    ---------------------- */
+/* --------------- Version      : V01              ---------------------- */
+/* --------------- Description  : LED_INTERFACE_H ---------------------- */
+/**************************************************************************/
+
+
+
+#ifndef LED_INTERFACE_H
+#define LED_INTERFACE_H
+
+
+
+void LED_voidInit(void);
+void LED_voidOn  (u8 copy_u8Led);
+void LED_voidOff (u8 copy_u8Led);
+void LED_voidToggle (u8 copy_u8Led);
+
+#endif
