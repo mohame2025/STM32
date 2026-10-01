@@ -1,0 +1,54 @@
+
+
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+#include "EXTI_interface.h"
+
+
+void ahmed(void)
+{
+    /* pin A2 HIGH */
+   MGPIO_voidSetPinvalue(GPIOA, PIN2, GPIO_HIGH);
+   /*Delay for 1 sec
+   MSTK_voidSetBusyWait(1000000);
+   
+    /* pin A2 HIGH */
+   MGPIO_voidSetPinvalue(GPIOA, PIN2, GPIO_LOW);
+   /*Delay for 1 sec
+   MSTK_voidSetBusyWait(1000000);
+
+}
+int main(void)
+{
+
+	RCC_voidInitSysClock();
+	/* Enable RCC for GPIOA */
+	RCC_voidEableClock(RCC_APB2 , 2);
+	
+	/* RCC AFIO  */
+	RCC_voidEableClock(RCC_APB2 , 0);
+   
+    MEXTI_voidSetCallBack(ahmed);
+	MNVIC_voidInit();
+ 
+   /*  GPIO Direction  */
+   /*  A0 = input  *
+    MGPIO_voidSetpinDirection(GPIOA, PIN0, INPUT_ PULL-DOWN_UP );
+	MGPIO_voidSetPinvalue(GPIOA, PIN0, GPIO_HIGH);
+  /* A2  * OUTPUT SPEED  2MHZ  PUSH PULL  */
+    MGPIO_voidSetpinDirection(GPIOA, PIN2, OUTPUT_SPEED_2MHZ_PP);
+    
+    MEXTI_voidInit();
+    MEXTI_voidSetSignalLatch(EXTI_LINE0, FALLING_EDGE);
+    
+     MNVIC_voidSetPriority(6, 2);	
+     MNVIC_voidEnableInterrupt(6);
+	
+	 //MNVIC_voidSetpendingflag(6);
+	
+	MAFIO_voidSetEXTIConfiguration(EXTI_LINE0 , GPIOA)
+	while(1);
+	
+    return 0;
+}
