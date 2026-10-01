@@ -1,0 +1,54 @@
+/*************************************************************************/
+/* --------------- Author       : Mohamed Mahrous ---------------------- */
+/* --------------- Date         : 30  MAY   2026   ---------------------- */
+/* --------------- Version      : V02             ---------------------- */
+/* --------------- Description  : LEDMRX_Program_C  ---------------------- */
+/*************************************************************************/
+
+
+#include "STD_TYPES.h"
+#include "BIT_MATH.h"
+
+
+#include "GPIO_interface.h"
+#include "SYSTICK_interface.h"
+
+#include "LED_interface.h"
+#include "LED_private.h"
+#include "LED_config.h"
+
+
+
+
+
+void LED_voidInit(void)
+{
+
+    MGPIO_voidSetpinDirection( LED_PORT[Copy_u8Led],LED_PIN[Copy_u8Led], OUTPUT_SPEED_10MHZ_PP);
+	
+	
+}
+void LED_voidOn(u8 Copy_u8Led)
+{
+	MGPIO_voidSetpinValue(LED_PORT[Copy_u8Led],LED_PIN[Copy_u8Led],GPIO_HIGH);
+}
+
+void LED_voidOff (u8 copy_u8Led)
+{
+    MGPIO_voidSetpinValue(LED_PORT[Copy_u8Led],LED_PIN[Copy_u8Led],GPIO_LOW);
+	
+}
+ 
+ 
+
+void LED_voidToggle (u8 copy_u8Led)
+{
+
+  MGPIO_voidSetpinToggle(LED_PORT[Copy_u8Led],LED_PIN[Copy_u8Led]);
+
+  	
+ }
+
+ 
+ 
+ 
